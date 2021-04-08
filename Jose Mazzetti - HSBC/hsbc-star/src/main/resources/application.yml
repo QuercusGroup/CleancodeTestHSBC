@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: hsbc-star
+    datasource:
+      username: sa
+      password:
+      driverClassName: org.h2.Driver
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: beans,env,health,info, metrics
