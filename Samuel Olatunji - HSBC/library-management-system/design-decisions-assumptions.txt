@@ -1,0 +1,42 @@
+Assumptions:
+1. To borrow book, all the input fields for all objects in request are mandatory.
+2. To borrow/rent a book, we need to follow below steps -
+	1. User should be created who wants to borrow a book
+		Sample request:
+			url: http://localhost:9080/api/user - POST
+			Body: 
+				{
+			        "userid": "109",
+			        "name": "Billy",
+			        "address": "NY, USA"
+			    }
+	2. Book should be created to borrow.
+		Sample request:
+			url: http://localhost:9080/api/book - POST
+			Body: 
+				{
+				    "isbn": "106",
+				    "title": "The Darkest Evening",
+				    "author": "Ann Cleeves",
+				    "publisher": "Pan Books",
+				    "status": "Available"
+				}
+	3. Now user should call borrow book end point and provide user, book and duration of rent details.
+		Sample request:
+			url: http://localhost:9080/api/borrow-book - POST
+			Body: 
+				{
+				    "id": 1,
+				    "isbn": "101",
+				    "userId": "1001",
+				    "borrowDate": "2021-03-31",
+				    "returnDate": "2021-04-30"
+				} 
+		Sample request to return book:
+			url: http://localhost:9080/api/return-book/{isbn}/{userID} - POST
+
+3. To return a book, user needs to call return book endpoint with user and book details.
+4. The service will start on port 9080.
+5. Sample data for books and users is inserted at the time of application startup.
+6. In memory H2 database is used to store data in this application.
+7. Swagger url - http://localhost:9080/swagger-ui.html this url can be used to refer the end points and their sample request responses.
