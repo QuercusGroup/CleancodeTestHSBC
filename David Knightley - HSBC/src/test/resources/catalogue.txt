@@ -1,0 +1,16 @@
+JKR0001,J.K. Rowling,Harry Potter and the Philosopher's Stone,1997
+JKR0002,J.K. Rowling,Harry Potter and the Chamber of Secrets,1998
+JKR0003,J.K. Rowling,Harry Potter and the Order of the Phoenix,2003
+IV00104,Immanual Velikovsky,Worlds in Collision,1950
+AIS0101,Aleksandr I Solzhenitsyn,The Gulag Archipelago,1973
+PG06004,Philippa Gregory,The White Queen,2009
+IF00007,Ian Fleming,Casino Royale,1953
+IF00008,Ian Flaming,Live and Let Die,1954
+IF01002,Ian Fleming,Chitty-Chitty-Bang-Bang: The Magical Car,1964
+AF02001,Alan Fleming,History of the World,2010
+RG02005,Robert Gregory,Everything You Wanted to Know,2002
+JR01010,Arthur Rowling,I'm not the Harry Potter Author,2014
+
+
+
+
