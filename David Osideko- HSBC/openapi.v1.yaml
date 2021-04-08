@@ -1,0 +1,885 @@
+openapi: 3.0.0
+info:
+  title: HSBC Library API
+  version: '1.0'
+  description: Interface for managing book collections and rentals
+  contact:
+    name: David Osideko
+    email: david.osideko@hsbc.co.uk
+servers:
+  - url: 'http://localhost:8000/v1'
+    description: Local API server
+  - url: 'https://hsbc.co.uk/library/api/v1'
+    description: Live API server
+paths:
+  /members:
+    parameters: []
+    get:
+      summary: Members list
+      tags:
+        - Membership
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+              examples: {}
+      operationId: getMembers
+      description: Retrieve the list of library users
+  /member:
+    post:
+      summary: Member creation
+      operationId: createMember
+      responses:
+        '201':
+          description: User successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples: {}
+        '400':
+          description: A required field was not provided
+        '409':
+          description: The provided email already exists
+        '500':
+          description: An error occurred while creating the member record
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInfo'
+            examples:
+              Create User Matt:
+                value:
+                  firstName: Matt
+                  lastName: Damon
+                  email: matt.damon@hsbc.co.uk
+                  gender: MALE
+        description: Provide the necessary fields for user creation
+      description: Create a new user
+      tags:
+        - Membership
+    parameters: []
+  '/member/{id}':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+        description: The member's user identifier
+    get:
+      summary: Member retrieval
+      tags:
+        - Membership
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples: {}
+        '404':
+          description: A user with the provided identifier was not found
+        '500':
+          description: Error while retrieving the user's details
+      operationId: getMemberById
+      description: Retrieve a single library member associated with the provided unique identifier
+    put:
+      summary: Member update
+      operationId: updateMemberDetails
+      responses:
+        '200':
+          description: OK - Details successfully updated
+        '400':
+          description: Bad Request - invalid input data provided
+        '500':
+          description: An error occurred while updating this record
+      description: Update the details of the user with the corresponding id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInfo'
+            examples:
+              Update Matt's Profile:
+                value:
+                  firstName: Matt
+                  lastName: Hancock
+                  email: matt.hancock@hsbc.co.uk
+                  gender: FEMALE
+                  isStaff: true
+                  isLibrarian: true
+        description: Provide any user detail which you intend to update
+      tags:
+        - Membership
+    delete:
+      summary: Member deletion
+      operationId: deleteMember
+      responses:
+        '200':
+          description: OK - User successfully deleted
+        '404':
+          description: A user with the provided id does not exist
+        '500':
+          description: An error occurred while updating this record
+      description: Delete the record of the user with the corresponding id
+      tags:
+        - Membership
+  /catalogue:
+    get:
+      summary: Catalogue Retrieval
+      tags:
+        - Catalogue
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+      operationId: getAllBooks
+      description: Retrieve the full book catalogue
+  /catalogue/book:
+    post:
+      summary: Catalogue book creation
+      operationId: addBook
+      responses:
+        '201':
+          description: Detail created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '400':
+          description: Bad Request - one or more of the provided inputs is invalid
+        '500':
+          description: An error occurred while adding this book to the catalogue
+      description: Add a book to the catalogue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookInfo'
+            examples:
+              The Power of Now:
+                value:
+                  author: Eckhart Tolle
+                  title: The Power of Now
+                  description: A Guide to Spiritual Enlightenment
+                  isbn: '9780340733509'
+                  publishedDate: 0
+                  language: ENGLISH
+                  genre: SELF_HELP
+                  classification: B
+                  copiesAvailable: 1
+        description: Create a book record in the catalogue
+      tags:
+        - Catalogue
+  '/catalogue/book/{uuid}':
+    parameters:
+      - schema:
+          type: string
+        name: uuid
+        in: path
+        required: true
+        description: Universally unique identifier
+    get:
+      summary: Catalogue book retrieval
+      tags:
+        - Catalogue
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '400':
+          description: An invalid UUID was provided
+        '404':
+          description: A book with the provided UUID was not found
+        '500':
+          description: An error occured while retrieving the book with the provided identifier
+      operationId: getBookByUuid
+      description: Retrieve a book by its universally unique identifier
+    put:
+      summary: Catalogue book details update
+      operationId: updateBookDetails
+      responses:
+        '200':
+          description: OK - Update successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '400':
+          description: Bad Request - an invalid input was provided in the request
+        '500':
+          description: An error occurred while updating the book details
+      description: Update the details of the book with the associated universally unique identifier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookInfo'
+            examples:
+              The Power of Now:
+                value:
+                  author: Eckhart Tolle
+                  title: The Power of Now
+                  description: A Guide to Spiritual Enlightenment
+                  isbn: '9780340733509'
+                  publicationDate: '0'
+                  language: ENGLISH
+                  coverImageData: ''
+                  genre: SELF_HELP
+                  classification: B
+                  copiesAvailable: 1
+        description: Details of the book which require updating
+      tags:
+        - Catalogue
+    delete:
+      summary: Catalogue book deletion
+      operationId: deleteBookByUuid
+      responses:
+        '200':
+          description: Successfully deleted
+        '404':
+          description: A book with the provided identifier was not found
+        '500':
+          description: An error occurred while deleting the associated book
+      description: Delete the book with the associated unique identifier
+      tags:
+        - Catalogue
+  /rental:
+    post:
+      summary: Book rental creation
+      operationId: createRental
+      responses:
+        '201':
+          description: Book loan registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan'
+        '404':
+          description: Either a book with the provided uuid or member with the provided id was not found
+        '500':
+          description: An error occurred while creating the book loan record
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanInfo'
+            examples:
+              Minimum loan requirement:
+                value:
+                  bookUuid: c5043628-d7d5-4969-b6b9-9ad8bb2a57b7
+                  memberId: 1
+        description: Provide details of the loan
+      description: Create a record of a borrowed book
+      tags:
+        - Rental
+  '/rental/{id}':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+        description: Loan identifier
+    get:
+      summary: Book rental detail retrieval
+      tags:
+        - Rental
+      responses:
+        '200':
+          description: OK - Successful retrieval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan'
+        '404':
+          description: A rental record with the provided id does not exist
+        '500':
+          description: An error occured while retrieving the rental information
+      operationId: getRentalId
+      description: Retrieve the details of a single rental
+    put:
+      summary: Book rental detail update
+      operationId: updateRentalDetail
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan'
+      description: Update details relating to this book rental
+      tags:
+        - Rental
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanInfo'
+  '/library/{id}':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+        description: Library identifier
+    get:
+      summary: Library details retrieval
+      tags:
+        - Library
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Library'
+        '404':
+          description: The library with the specified identifier was not found
+        '500':
+          description: An error occurred while retrieving library details
+      operationId: getLibraryById
+      description: Retrieve details of the library with the associated identifier
+    put:
+      summary: Library details update
+      operationId: updateLibrary
+      responses:
+        '200':
+          description: Library details updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Library'
+        '400':
+          description: Bad Request - invalid data provided in the payload
+        '500':
+          description: An error occured while updating library information
+      description: Update the details of the library with the associated identifier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LibraryInfo'
+            examples:
+              Test Canterbury Library:
+                value:
+                  name: Canterbury Library
+                  address: Somewhere else in the UK
+                  email: library@canterbury.co.uk
+                  phoneNumber: '0'
+        description: Provide library details to override
+      tags:
+        - Library
+  /library:
+    post:
+      summary: Library creation
+      operationId: addLibrary
+      responses:
+        '201':
+          description: Library profile created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Library'
+        '400':
+          description: Bad Request - missing or invalid input values provided
+        '500':
+          description: Error creating the library profile
+      description: Add an additional partner library to facilitate future inter-library loans
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LibraryInfo'
+        description: Provide basic details for creating a library profile
+      tags:
+        - Library
+    get:
+      summary: Retrieve this library's info
+      operationId: getThisLibrary
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Library'
+        '500':
+          description: An error occured while retrieving this library's details
+      description: Retrieve this library's details
+      tags:
+        - Library
+  /libraries:
+    get:
+      summary: Retrieve all library details
+      tags:
+        - Library
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Library'
+        '500':
+          description: An error occurred while retrieving all library details
+      operationId: getAllLibraries
+      description: Retrieve information about all libraries
+  /rentals:
+    get:
+      summary: Retrieve all current rentals
+      tags:
+        - Rental
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Loan'
+        '500':
+          description: Error occurred while retrieving all rental records
+      operationId: getAllRentals
+      description: Retrieve all current rentals
+      parameters:
+        - schema:
+            type: boolean
+            default: 'false'
+          in: query
+          name: includeReturned
+          description: Specifies whether to include records of already returned books as well
+          allowEmptyValue: true
+components:
+  schemas:
+    UserInfo:
+      title: User Info
+      type: object
+      description: ''
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        isStaff:
+          type: boolean
+          description: Specifies whether the user is a library staff
+        subscriptionDate:
+          type: string
+          format: date
+          description: Joining date as milliseconds from the epoch or in ISO 8601 timestamp format
+        gender:
+          type: string
+          enum:
+            - MALE
+            - FEMALE
+            - TRANSGENDER
+            - NEUTRAL
+            - NON_BINARY
+            - AGENDER
+            - PANGENDER
+            - GENDERQUEER
+            - TWO_SPIRIT
+            - THIRD_GENDER
+            - ALL
+            - NONE
+        isLibrarian:
+          type: boolean
+          description: Defines whether this user is a librarian staff member
+      required:
+        - firstName
+        - lastName
+        - email
+        - gender
+    User:
+      title: User
+      type: object
+      description: ''
+      x-examples:
+        David Osideko:
+          id: 1
+          firstName: David
+          lastName: Osideko
+          email: david.osideko@hsbc.com
+          isStaff: true
+          subscriptionDate: 1616936513599
+          gender: MALE
+          isLibrarian: true
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the user
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        isStaff:
+          type: boolean
+          description: Specifies whether the user is a library staff
+        subscriptionDate:
+          type: string
+          format: date
+          description: Joining date as milliseconds from the epoch or in ISO 8601 timestamp format
+        gender:
+          type: string
+          enum:
+            - MALE
+            - FEMALE
+            - TRANSGENDER
+            - NEUTRAL
+            - NON_BINARY
+            - AGENDER
+            - PANGENDER
+            - GENDERQUEER
+            - TWO_SPIRIT
+            - THIRD_GENDER
+            - ALL
+            - NONE
+        isLibrarian:
+          type: boolean
+          description: Defines whether this user is a librarian staff member
+      required:
+        - firstName
+        - lastName
+        - email
+    Book:
+      title: Book
+      type: object
+      x-examples:
+        The Ickabog - J.K. Rowling:
+          id: 1
+          uuid: c5043628-d7d5-4969-b6b9-9ad8bb2a57b7
+          author: J.K. Rowling
+          description: The Ickabog is a children's fairy tale
+          isbn: 978-3-16-148410-0
+          publicationDate: 1604966400
+          coverImageData: 'data:image/jpeg;base64,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'
+          language: ENGLISH
+          genre: FICTION
+          classification: A
+          copiesAvailable: 1
+          title: The Ickabog
+      properties:
+        id:
+          type: integer
+        uuid:
+          type: string
+          description: Universally unique identifier
+        author:
+          type: string
+        description:
+          type: string
+        isbn:
+          type: string
+          description: International Standard Book Number
+        publicationDate:
+          type: string
+          description: Publication date in milliseconds from the epoch or in ISO 8601 timestamp format
+        coverImageData:
+          type: string
+          description: Base64 encoded cover image
+        language:
+          type: string
+          enum:
+            - ENGLISH
+            - FRENCH
+        genre:
+          type: string
+          description: One or more genres relating to this book
+          enum:
+            - FICTION
+            - NON_FICTION
+            - SELF_HELP
+            - CLASSIC
+            - REFERENCE
+            - JOURNAL
+            - MAGAZINE
+        classification:
+          type: string
+          description: The Library of Congress Classification
+          enum:
+            - A
+            - B
+            - C
+            - D
+            - E
+            - F
+            - G
+            - H
+            - J
+            - K
+            - L
+            - M
+            - 'N'
+            - P
+            - Q
+            - R
+            - S
+            - T
+            - U
+            - V
+            - Z
+        copiesAvailable:
+          type: integer
+          description: The number of available copies of this book
+        title:
+          type: string
+      required:
+        - author
+        - isbn
+        - publicationDate
+        - genre
+        - classification
+        - title
+    LoanInfo:
+      title: Loan Info
+      type: object
+      properties:
+        bookUuid:
+          type: string
+          description: Unique identifier for the book on loan
+        fromDate:
+          type: string
+          description: Date the book was borrowed
+          format: date
+        dueDate:
+          type: string
+          description: Date the book is expected to be returned
+          format: date
+        returnDate:
+          type: string
+          description: Actual return date of the book
+          format: date
+        chargeDue:
+          type: number
+          description: Charges due to late returns or loss of the book
+          format: double
+          default: 0
+          minimum: 0
+        chargePaid:
+          type: number
+          description: Amount paid by the borrower
+          default: 0
+          format: double
+        memberId:
+          type: integer
+          description: 'User id, if the book was borrowed by a member'
+        libraryId:
+          type: integer
+          description: 'Library id, if this is an inter-library loan'
+      required:
+        - bookUuid
+    Loan:
+      title: Loan
+      type: object
+      x-examples:
+        Loan to David:
+          id: 1
+          bookUuid: c5043628-d7d5-4969-b6b9-9ad8bb2a57b7
+          fromDate: 1616954323
+          dueDate: 1619619584
+          returnDate: 0
+          chargeDue: 0
+          chargePaid: 0
+          memberId: 10
+          libraryId: 0
+      properties:
+        id:
+          type: integer
+        bookUuid:
+          type: string
+          description: Unique identifier for the book on loan
+        fromDate:
+          type: string
+          description: Date the book was borrowed
+          format: date
+        dueDate:
+          type: string
+          description: Date the book is expected to be returned
+          format: date
+        returnDate:
+          type: string
+          description: Actual return date of the book
+          format: date
+        chargeDue:
+          type: number
+          description: Charges due to late returns or loss of the book
+          format: double
+          default: 0
+          minimum: 0
+        chargePaid:
+          type: number
+          description: Amount paid by the borrower
+          default: 0
+          format: double
+        memberId:
+          type: integer
+          description: 'User id, if the book was borrowed by a member'
+        libraryId:
+          type: integer
+          description: 'Library id, if this is an inter-library loan'
+      required:
+        - bookUuid
+    LibraryInfo:
+      title: Library Info
+      type: object
+      x-examples: {}
+      properties:
+        name:
+          type: string
+          description: Library name
+        address:
+          type: string
+          description: Full address of the library
+        email:
+          type: string
+          format: email
+          description: Contact email
+        phoneNumber:
+          type: string
+          description: Contact phone number
+    Library:
+      title: Library
+      type: object
+      x-examples:
+        HSBC Staff Library:
+          id: 1
+          name: HSBC Staff Library
+          address: Somewhere in the UK
+          email: staff.library@hsbc.co.uk
+          phoneNumber: 1227123456
+          isSelf: true
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          description: Library name
+        address:
+          type: string
+          description: Full address of the library
+        email:
+          type: string
+          format: email
+          description: Contact email
+        phoneNumber:
+          type: string
+          description: Contact phone number
+        self:
+          type: boolean
+          description: Specifies whether the object details refer to this service owner i.e. HSBC
+    BookInfo:
+      title: Book Info
+      description: ''
+      type: object
+      x-examples:
+        Power of Now:
+          author: Eckhart Tolle
+          title: The Power of Now
+          description: A Guide to Spiritual Enlightenment
+          isbn: '9780340733509'
+          publicationDate: 0
+          language: ENGLISH
+          coverImageData: ''
+          genre: SELF_HELP
+          classification: B
+          copiesAvailable: 1
+      properties:
+        author:
+          type: string
+        description:
+          type: string
+        isbn:
+          type: string
+          description: International Standard Book Number
+        publicationDate:
+          type: string
+          description: Publication date in milliseconds from the epoch or in ISO 8601 timestamp format
+        coverImageData:
+          type: string
+          description: Base64 encoded cover image
+        language:
+          type: string
+          enum:
+            - ENGLISH
+            - FRENCH
+        genre:
+          type: string
+          description: One or more genres relating to this book
+          enum:
+            - FICTION
+            - NON_FICTION
+            - SELF_HELP
+            - CLASSIC
+            - REFERENCE
+            - JOURNAL
+            - MAGAZINE
+        classification:
+          type: string
+          description: The Library of Congress Classification
+          enum:
+            - A
+            - B
+            - C
+            - D
+            - E
+            - F
+            - G
+            - H
+            - J
+            - K
+            - L
+            - M
+            - 'N'
+            - P
+            - Q
+            - R
+            - S
+            - T
+            - U
+            - V
+            - Z
+        copiesAvailable:
+          type: integer
+          description: The number of available copies of this book
+        title:
+          type: string
+      required:
+        - author
+        - isbn
+        - language
+        - genre
+        - classification
+        - copiesAvailable
+        - title
+tags:
+  - name: Catalogue
+  - name: Library
+  - name: Membership
+  - name: Rental
